@@ -12,6 +12,92 @@ import Divider from '@material-ui/core/Divider';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import useData from './Listener';
+import RateChart from './RateChart';
+import * as d3 from 'd3';
+
+function sameDate(d, i) {
+  if (d instanceof Date && i instanceof Date) {
+    return d.getYear() === i.getYear() && d.getMonth() === i.getMonth() && d.getDate() === i.getDate();
+  }
+  else {
+    return false;
+  }
+}
+
+export default function Dashboard() {
+
+  const data = useData();
+  const classes = useStyles();
+  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  if (!data) {
+    return <pre>Loading...</pre>
+  }
+
+  for (var i = 0; i < 7; i++) {
+    var e = new Date(new Date().setDate(new Date().getDate() - i));
+    var idate = new Date(Date.UTC(e.getFullYear(), e.getMonth(), e.getDate()));
+
+    var temp = {
+      date: idate,
+      total_cases: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.total_cases),
+      new_cases: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases),
+      new_deaths: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases),
+      total_cases_per_million: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.total_cases_per_million),
+      new_cases_per_million: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases_per_million),
+      new_deaths_per_million: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_deaths_per_million),
+      continent: 'all',
+      location: 'all'
+    };
+
+    data.push(temp);
+  }
+
+  console.log(data.filter(d => d.location === 'all'));
+
+  return (
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar position="absolute" className={classes.appBar}>
+        <Toolbar className={classes.toolbar}>
+          <div className={classes.toolbarIcon}>
+            <Icon>
+              <DashboardIcon />
+            </Icon>
+          </div>
+          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+            Covid-19 Statistics Dashboard
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      {/* Sidebar Navigation */}
+      <Drawer
+        variant="permanent"
+        classes={{
+          paper: classes.drawerPaper
+        }}
+        className={classes.drawer}
+      >
+        <Toolbar />
+      </Drawer>
+      <main className={classes.content}>
+        <div className={classes.appBarSpacer} />
+        <Container maxWidth="lg" className={classes.container}>
+          <Grid item xs={6}>
+            <Paper className={fixedHeightPaper}>
+              <RateChart
+                title='New Cases'
+                data={data.filter(d => d.location === 'all')}
+                y='new_cases'
+              />
+            </Paper>
+          </Grid>
+        </Container>
+      </main>
+    </div>
+  );
+}
 
 const drawerWidth = 250;
 
@@ -109,43 +195,3 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center'
   }
 }));
-
-export default function Dashboard() {
-  const classes = useStyles();
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-
-  /* INPUT SETTINGS */
-
-  return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="absolute" className={classes.appBar}>
-        <Toolbar className={classes.toolbar}>
-          <div className={classes.toolbarIcon}>
-            <Icon>
-              <DashboardIcon />
-            </Icon>
-          </div>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Covid-19 Statistics Dashboard
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      {/* Sidebar Navigation */}
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper
-        }}
-        className={classes.drawer}
-      >
-        <Toolbar />
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-        </Container>
-      </main>
-    </div>
-  );
-}
