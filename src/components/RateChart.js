@@ -1,17 +1,17 @@
 import React from 'react';
 import { useTheme } from '@material-ui/core/styles';
 import { LineChart, CartesianGrid, Line, XAxis, YAxis, Label, Tooltip, ResponsiveContainer } from 'recharts';
-import { timeFormat } from 'd3';
+import { format, timeFormat } from 'd3';
 import Title from './Title';
 
 const xTickFormat = timeFormat('%m/%d');
 
-export default function RateChart({ title, data, y, yAxisLabel = 'Rate (per 100,000)' }) {
+const yTickFormat = format('.2s');
+
+export default function RateChart({ title, data, y, yAxisLabel }) {
   const theme = useTheme();
 
-  for (let i = 0; i < data.length; i++) {
-    data[i].date = xTickFormat(data[i].date);
-  }
+  data = data.reverse();
 
   return (
     <React.Fragment>
@@ -30,9 +30,9 @@ export default function RateChart({ title, data, y, yAxisLabel = 'Rate (per 100,
           <XAxis
             dataKey="date"
             stroke={theme.palette.text.secondary}
-            // tickFormatter={xTickFormat}
+            tickFormatter={xTickFormat}
           />
-          <YAxis datakey={y} stroke={theme.palette.text.secondary}>
+          <YAxis datakey={y} stroke={theme.palette.text.secondary} tickFormatter={yTickFormat} >
             <Label
               angle={270}
               position="left"
@@ -42,7 +42,7 @@ export default function RateChart({ title, data, y, yAxisLabel = 'Rate (per 100,
             </Label>
           </YAxis>
           <Tooltip />
-          <Line type="monotone" dataKey="rate" stroke={theme.palette.primary.main} dot={false} />
+          <Line type="monotone" dataKey={y} stroke={theme.palette.primary.main} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>

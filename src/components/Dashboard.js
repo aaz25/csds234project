@@ -35,7 +35,7 @@ export default function Dashboard() {
     return <pre>Loading...</pre>
   }
 
-  for (var i = 0; i < 7; i++) {
+  for (var i = 2; i < 10; i++) {
     var e = new Date(new Date().setDate(new Date().getDate() - i));
     var idate = new Date(Date.UTC(e.getFullYear(), e.getMonth(), e.getDate()));
 
@@ -43,13 +43,18 @@ export default function Dashboard() {
       date: idate,
       total_cases: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.total_cases),
       new_cases: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases),
-      new_deaths: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases),
-      total_cases_per_million: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.total_cases_per_million),
-      new_cases_per_million: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases_per_million),
-      new_deaths_per_million: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_deaths_per_million),
+      new_deaths: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_deaths),
+      total_cases_per_million: 0,
+      new_cases_per_million: 0,
+      new_deaths_per_million: 0,
+      population: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.population),
       continent: 'all',
       location: 'all'
     };
+    
+    temp.total_cases_per_million = (temp.total_cases / temp.population) * 1000000;
+    temp.new_cases_per_million = (temp.new_cases / temp.population) * 1000000;
+    temp.new_deaths_per_million = (temp.new_deaths / temp.population) * 1000000;
 
     data.push(temp);
   }
@@ -84,14 +89,67 @@ export default function Dashboard() {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <Grid item xs={6}>
-            <Paper className={fixedHeightPaper}>
-              <RateChart
-                title='New Cases'
-                data={data.filter(d => d.location === 'all')}
-                y='new_cases'
-              />
-            </Paper>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Paper className={fixedHeightPaper}>
+                <RateChart
+                  title='New Cases'
+                  data={data.filter(d => d.location === 'all')}
+                  y='new_cases'
+                  yAxisLabel='Number New Cases per Day'
+                />
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper className={fixedHeightPaper}>
+                <RateChart
+                  title='Total Cases'
+                  data={data.filter(d => d.location === 'all')}
+                  y='total_cases'
+                  yAxisLabel='Total Cases'
+                />
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper className={fixedHeightPaper}>
+                <RateChart
+                  title='New Cases Per Million People'
+                  data={data.filter(d => d.location === 'all')}
+                  y='new_cases_per_million'
+                  yAxisLabel='New Cases per Million People'
+                />
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper className={fixedHeightPaper}>
+                <RateChart
+                  title='Total Cases per Million People'
+                  data={data.filter(d => d.location === 'all')}
+                  y='total_cases_per_million'
+                  yAxisLabel='Total Cases per Million People'
+                />
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper className={fixedHeightPaper}>
+                <RateChart
+                  title='New Deaths'
+                  data={data.filter(d => d.location === 'all')}
+                  y='new_deaths'
+                  yAxisLabel='Number of New Deaths per Day'
+                />
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper className={fixedHeightPaper}>
+                <RateChart
+                  title='New Deaths per Million People'
+                  data={data.filter(d => d.location === 'all')}
+                  y='new_deaths_per_million'
+                  yAxisLabel='New Deaths per Million People'
+                />
+              </Paper>
+            </Grid>
           </Grid>
         </Container>
       </main>
