@@ -15,6 +15,7 @@ import Paper from '@material-ui/core/Paper';
 import useData from './Listener';
 import RateChart from './RateChart';
 import * as d3 from 'd3';
+import StatTable from './StatTable';
 
 function sameDate(d, i) {
   if (d instanceof Date && i instanceof Date) {
@@ -90,6 +91,13 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Paper className={fixedHeightPaper}>
+                <StatTable
+                  data={data.filter(d => d.location === 'all')}
+                />
+              </Paper>
+            </Grid>
             <Grid item xs={6}>
               <Paper className={fixedHeightPaper}>
                 <RateChart
