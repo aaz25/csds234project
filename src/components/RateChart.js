@@ -11,7 +11,9 @@ const yTickFormat = format('.2s');
 export default function RateChart({ title, data, y, yAxisLabel }) {
   const theme = useTheme();
 
-  data = data.reverse();
+  // if (data.location === 'All') {
+  //   data = data.reverse();
+  // }
 
   return (
     <React.Fragment>

@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { csv } from 'd3';
+import { csv, filter, sum } from 'd3';
 
 const url = 'https://covid.ourworldindata.org/data/owid-covid-data.csv';
+
+function sameDate(d, i) {
+  if (d instanceof Date && i instanceof Date) {
+    return d.getYear() === i.getYear() && d.getMonth() === i.getMonth() && d.getDate() === i.getDate();
+  }
+  else {
+    return false;
+  }
+}
 
 export default function useData() {
   const [data, setData] = useState(null);
@@ -22,7 +31,8 @@ export default function useData() {
         location: d.location
       };
 
-      if (Math.floor((new Date().getDate() - r.date) / (1000 * 60 * 60 * 24)) < 10) {
+      if (Math.floor((new Date() - r.date) / (1000 * 60 * 60 * 24)) < 12 &&
+          Math.floor((new Date() - r.date) / (1000 * 60 * 60 * 24)) >= 2) {
         return r;
       }
     };

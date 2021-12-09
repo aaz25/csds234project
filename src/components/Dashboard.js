@@ -8,7 +8,6 @@ import { Box, Icon } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -16,6 +15,8 @@ import useData from './Listener';
 import RateChart from './RateChart';
 import * as d3 from 'd3';
 import StatTable from './StatTable';
+import GeoSelect from './GeoSelect';
+import options from '../options';
 
 function sameDate(d, i) {
   if (d instanceof Date && i instanceof Date) {
@@ -30,37 +31,17 @@ export default function Dashboard() {
 
   const data = useData();
   const classes = useStyles();
+  const [location, setLocation] = useState('World');
+
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  const handleChange = (event) => {
+    setLocation(event.target.value);
+  };
 
   if (!data) {
     return <pre>Loading...</pre>
   }
-
-  for (var i = 2; i < 10; i++) {
-    var e = new Date(new Date().setDate(new Date().getDate() - i));
-    var idate = new Date(Date.UTC(e.getFullYear(), e.getMonth(), e.getDate()));
-
-    var temp = {
-      date: idate,
-      total_cases: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.total_cases),
-      new_cases: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_cases),
-      new_deaths: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.new_deaths),
-      total_cases_per_million: 0,
-      new_cases_per_million: 0,
-      new_deaths_per_million: 0,
-      population: d3.sum(data.filter(d => sameDate(d.date, idate)), d => d.population),
-      continent: 'all',
-      location: 'all'
-    };
-    
-    temp.total_cases_per_million = (temp.total_cases / temp.population) * 1000000;
-    temp.new_cases_per_million = (temp.new_cases / temp.population) * 1000000;
-    temp.new_deaths_per_million = (temp.new_deaths / temp.population) * 1000000;
-
-    data.push(temp);
-  }
-
-  console.log(data.filter(d => d.location === 'all'));
 
   return (
     <div className={classes.root}>
@@ -86,6 +67,9 @@ export default function Dashboard() {
         className={classes.drawer}
       >
         <Toolbar />
+        <Box className={classes.navTool}>
+          <GeoSelect options={options} location={location} handleChange={handleChange} />
+        </Box>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -94,7 +78,7 @@ export default function Dashboard() {
             <Grid item xs={12}>
               <Paper className={fixedHeightPaper}>
                 <StatTable
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                 />
               </Paper>
             </Grid>
@@ -102,7 +86,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <RateChart
                   title='New Cases'
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                   y='new_cases'
                   yAxisLabel='Number New Cases per Day'
                 />
@@ -112,7 +96,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <RateChart
                   title='Total Cases'
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                   y='total_cases'
                   yAxisLabel='Total Cases'
                 />
@@ -122,7 +106,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <RateChart
                   title='New Cases Per Million People'
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                   y='new_cases_per_million'
                   yAxisLabel='New Cases per Million People'
                 />
@@ -132,7 +116,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <RateChart
                   title='Total Cases per Million People'
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                   y='total_cases_per_million'
                   yAxisLabel='Total Cases per Million People'
                 />
@@ -142,7 +126,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <RateChart
                   title='New Deaths'
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                   y='new_deaths'
                   yAxisLabel='Number of New Deaths per Day'
                 />
@@ -152,7 +136,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <RateChart
                   title='New Deaths per Million People'
-                  data={data.filter(d => d.location === 'all')}
+                  data={data.filter(d => d.location === location)}
                   y='new_deaths_per_million'
                   yAxisLabel='New Deaths per Million People'
                 />
