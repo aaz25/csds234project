@@ -13,19 +13,9 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import useData from './Listener';
 import RateChart from './RateChart';
-import * as d3 from 'd3';
 import StatTable from './StatTable';
 import GeoSelect from './GeoSelect';
 import options from '../options';
-
-function sameDate(d, i) {
-  if (d instanceof Date && i instanceof Date) {
-    return d.getYear() === i.getYear() && d.getMonth() === i.getMonth() && d.getDate() === i.getDate();
-  }
-  else {
-    return false;
-  }
-}
 
 export default function Dashboard() {
 
@@ -234,8 +224,8 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(2)
   },
   navTool: {
-    padding: theme.spacing(1),
-    paddingTop: theme.spacing(2),
+    padding: theme.spacing(2),
+    paddingTop: theme.spacing(4),
     display: 'flex',
     justifyContent: 'center'
   },
